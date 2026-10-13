@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- DEMO: keep this page out of search engines until the owner approves it. Remove this line when it goes live. -->
+<meta name="robots" content="noindex, nofollow">
+<title>oliv espresso lab | Coquitlam</title>
+<meta name="description" content="espresso + matcha + life. Layered lattes and matcha on Glen Drive, Coquitlam, next door to the Pilates studio.">
+<meta name="theme-color" content="#EDF1E2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Albert+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  } }
+</script>
+<style>
+  :root{
+    --olive:#36452F;     /* the logo */
+    --matcha:#7BA23F;
+    --espresso:#6B3E22;
+    --berry:#D43F52;     /* strawberry drizzle */
+    --banana:#F4DF8E;
+    --mint:#EDF1E2;      /* soft matcha tint */
+    --paper:#FAFAF6;
+    --wood:#C9A27A;
+    --line:#DDE2D2;
+    --muted:#5E6658;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+  body{background:var(--paper);color:var(--olive);font-family:"Albert Sans",system-ui,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  :focus-visible{outline:3px solid var(--berry);outline-offset:3px;border-radius:6px}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  @media (max-width:600px){.wrap{padding:0 16px}}
+  .round{font-family:"Fredoka","Albert Sans",sans-serif}
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+  .demo{background:var(--olive);color:#E8EDDC;font-size:14px;text-align:center;padding:8px 16px}
+  .demo a{color:var(--banana)}
+
+  /* header */
+  header{background:var(--mint)}
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:16px;padding-bottom:16px}
+  .logo{display:flex;align-items:baseline;gap:8px;text-decoration:none}
+  .logo b{font-family:"Fredoka",sans-serif;font-weight:700;font-size:36px;line-height:1;letter-spacing:-.02em}
+  .logo span{font-size:12px;font-weight:600;color:var(--muted)}
+  nav{display:flex;gap:24px;align-items:center;font-weight:500;font-size:15px}
+  nav a{text-decoration:none}
+  nav a:hover{text-decoration:underline;text-underline-offset:4px}
+  .pill-btn{background:var(--olive);color:var(--paper);padding:10px 18px;border-radius:999px;font-weight:600;text-decoration:none!important}
+  .pill-btn:hover{background:#26311F}
+  @media (max-width:760px){nav .hide-sm{display:none}}
+
+  /* hero: the lab. Words sit around the cup */
+  .hero{background:var(--mint);border-radius:0 0 40px 40px;padding:18px 0 46px;overflow:hidden}
+  .lab{display:grid;grid-template-columns:1fr minmax(280px,400px) 1fr;grid-template-areas:"left cup right" "pick pick pick" "life life life";align-items:center;column-gap:8px}
+  .word{font-family:"Fredoka",sans-serif;font-weight:700;font-size:clamp(44px,5.4vw,84px);line-height:.9;letter-spacing:-.03em;white-space:nowrap}
+  .w-left{grid-area:left;text-align:right;color:var(--espresso)}
+  .w-right{grid-area:right;color:var(--matcha)}
+  .w-life{grid-area:life;text-align:center;color:var(--olive);margin-top:10px}
+  .plus{font-weight:400;opacity:.55}
+  .stage{grid-area:cup;position:relative;height:clamp(380px,44vw,560px)}
+  #lab3d{position:absolute;inset:0;width:100%;height:100%;display:none;touch-action:pan-y;cursor:grab}
+  #lab3d:active{cursor:grabbing}
+  .stage.is-3d #lab3d{display:block}
+  .stage.is-3d .fallback{display:none}
+  .fallback{position:absolute;inset:0;display:grid;place-items:center}
+  .picker{grid-area:pick;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:-6px}
+  .chip{font:inherit;font-size:14px;font-weight:600;border:1.5px solid var(--olive);background:var(--paper);color:var(--olive);border-radius:999px;padding:8px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+  .chip i{width:12px;height:12px;border-radius:50%;display:inline-block}
+  .chip[aria-pressed="true"]{background:var(--olive);color:var(--paper)}
+  .chip:hover{border-color:#26311F}
+  .hero-foot{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px;margin-top:26px}
+  .status{display:inline-flex;align-items:center;gap:8px;background:var(--paper);border-radius:999px;padding:9px 16px;font-weight:600;font-size:15px}
+  .dot{width:9px;height:9px;border-radius:50%;background:#AEB3A6}
+  .dot.open{background:var(--matcha);box-shadow:0 0 0 4px rgba(123,162,63,.22)}
+  .btn{display:inline-block;padding:11px 20px;border-radius:999px;font-weight:600;font-size:15px;text-decoration:none;border:1.5px solid var(--olive)}
+  .btn.solid{background:var(--olive);color:var(--paper)}
+  .btn.solid:hover{background:#26311F}
+  .btn.line:hover{background:var(--olive);color:var(--paper)}
+  .hint{text-align:center;font-size:13px;color:var(--muted);margin-top:10px}
+  @media (max-width:860px){
+    .lab{grid-template-columns:1fr 1fr;grid-template-areas:"left right" "cup cup" "pick pick" "life life";row-gap:0}
+    .w-left,.w-right{font-size:clamp(32px,9.6vw,60px)}
+    .w-life{margin-top:18px}
+    .stage{height:400px}
+  }
+
+  /* CSS cup: the fallback in the hero and the small cups on the menu cards */
+  .mini{position:relative;width:76px;height:104px;border-radius:6px 6px 16px 16px;clip-path:polygon(0 0,100% 0,88% 100%,12% 100%);background:#E9ECE2;box-shadow:inset 0 0 0 2px rgba(54,69,47,.12)}
+  .fallback .mini{width:170px;height:230px}
+
+  section{padding:84px 0}
+  @media (max-width:600px){section{padding:60px 0}}
+  h2{font-family:"Fredoka",sans-serif;font-weight:700;font-size:clamp(34px,5vw,56px);line-height:1;letter-spacing:-.02em}
+  .lede{color:var(--muted);max-width:52ch;margin-top:12px;font-size:18px}
+
+  /* drinks */
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:40px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:28px;padding:24px 22px;display:flex;flex-direction:column;gap:10px}
+  .card .mini{margin-bottom:6px}
+  .card h3{font-family:"Fredoka",sans-serif;font-weight:600;font-size:22px;line-height:1.15}
+  .card p{color:var(--muted);font-size:15px;flex:1}
+  .card button{align-self:flex-start;font:inherit;font-size:14px;font-weight:600;background:var(--mint);color:var(--olive);border:0;border-radius:999px;padding:8px 14px;cursor:pointer}
+  .card button:hover{background:#DFE6CF}
+  .menu-note{margin-top:26px;font-size:14px;color:var(--muted)}
+  @media (max-width:900px){.cards{grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:72%;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px}.card{scroll-snap-align:start}}
+
+  /* pilates next door */
+  .sip{background:var(--banana);border-radius:40px;margin:0 16px}
+  .sip-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+  .sip h2{font-size:clamp(44px,7vw,92px);line-height:.92}
+  .sip p{font-size:18px;max-width:42ch;color:#4A4A2C}
+  .sip .btn{margin-top:20px}
+  @media (max-width:760px){.sip{margin:0 8px;border-radius:28px}.sip-grid{grid-template-columns:1fr;gap:16px}}
+
+  /* visit */
+  .visit-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:28px;margin-top:36px;align-items:stretch}
+  .info{background:var(--mint);border-radius:28px;padding:30px}
+  .hours{list-style:none;margin-top:6px}
+  .hours li{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+  .hours li.today{font-weight:700}
+  .hours li.today span:first-child::after{content:"  today";font-weight:600;color:var(--matcha);font-size:13px}
+  .addr{margin-top:20px;font-weight:600;line-height:1.45}
+  .addr small{display:block;font-weight:400;color:var(--muted);margin-top:4px}
+  .info .btn{margin-top:18px}
+  .map{border:0;width:100%;min-height:380px;height:100%;border-radius:28px;background:#E4E8DA}
+  @media (max-width:860px){.visit-grid{grid-template-columns:1fr}.map{min-height:300px}}
+
+  footer{padding:40px 0 52px;text-align:center;color:var(--muted);font-size:14px}
+  footer .logo{justify-content:center;color:var(--olive)}
+  footer p{margin-top:10px}
+</style>
+</head>
+<body>
+
+<div class="demo" role="note">
+  Demo made for Oliv Espresso Lab by Sahan Nonis. This is not an official website.
+  <a href="mailto:sahanconnor@gmail.com">Questions? Email me</a>
+</div>
+
+<header>
+  <div class="wrap bar">
+    <a class="logo" href="#top" aria-label="oliv espresso lab home"><b>oliv</b><span>espresso lab</span></a>
+    <nav aria-label="Main">
+      <a class="hide-sm" href="#drinks">Drinks</a>
+      <a class="hide-sm" href="#pilates">Pilates + coffee</a>
+      <a class="hide-sm" href="#visit">Visit</a>
+      <a class="pill-btn" href="https://ig.me/m/oliv.espressolab" target="_blank" rel="noopener">Message us</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" aria-labelledby="hero-title">
+    <h1 class="sr-only" id="hero-title">oliv espresso lab: espresso + matcha + life</h1>
+    <div class="wrap">
+      <div class="lab">
+        <p class="word w-left" aria-hidden="true">espresso</p>
+        <div class="stage" id="stage">
+          <canvas id="lab3d" role="img" aria-label="3D iced drink in a clear cup. Pick a drink below to watch it fill layer by layer. Drag sideways to turn the cup."></canvas>
+          <div class="fallback"><div class="mini" id="fallback-cup" aria-hidden="true"></div></div>
+        </div>
+        <p class="word w-right" aria-hidden="true"><span class="plus">+</span> matcha</p>
+        <div class="picker" role="group" aria-label="Pick a drink to see it in the cup" id="picker"></div>
+        <p class="word w-life" aria-hidden="true"><span class="plus">+</span> life.</p>
+      </div>
+      <p class="hint" id="hint" hidden>Pick a drink to pour it. Drag the cup to turn it.</p>
+      <div class="hero-foot">
+        <span class="status"><span class="dot" id="dot"></span><span id="status-text">Open every day</span></span>
+        <a class="btn solid" href="https://www.google.com/maps/dir/?api=1&destination=Oliv+Espresso+Lab,+2918+Glen+Dr+%23115B,+Coquitlam,+BC" target="_blank" rel="noopener">Get directions</a>
+        <a class="btn line" href="#drinks">See the drinks</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="drinks">
+    <div class="wrap">
+      <h2>from the lab</h2>
+      <p class="lede">Layered espresso and matcha drinks, made one at a time. Here's what people come back for.</p>
+      <div class="cards" id="cards"></div>
+      <p class="menu-note">In the finished site, this becomes your full menu with prices, and you can update it yourself in a couple of minutes.</p>
+    </div>
+  </section>
+
+  <section class="sip" id="pilates">
+    <div class="wrap sip-grid">
+      <h2>stretch first. sip after.</h2>
+      <div>
+        <p>Oliv shares its home with the Pilates and physio studio next door. Book a class, then reward yourself with a strawberry matcha on the way out.</p>
+        <a class="btn solid" href="https://ig.me/m/oliv.espressolab" target="_blank" rel="noopener">Ask us about classes</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="visit">
+    <div class="wrap">
+      <h2>come by the lab</h2>
+      <p class="lede">A small, bright spot on Glen Drive. Perfect for a quick drink or a slow one.</p>
+      <div class="visit-grid">
+        <div class="info">
+          <ul class="hours" id="hours" aria-label="Opening hours">
+            <li data-d="1"><span>Monday</span><span>9:30 am – 6 pm</span></li>
+            <li data-d="2"><span>Tuesday</span><span>9:30 am – 6 pm</span></li>
+            <li data-d="3"><span>Wednesday</span><span>9:30 am – 6 pm</span></li>
+            <li data-d="4"><span>Thursday</span><span>9:30 am – 6 pm</span></li>
+            <li data-d="5"><span>Friday</span><span>9:30 am – 6 pm</span></li>
+            <li data-d="6"><span>Saturday</span><span>10 am – 6 pm</span></li>
+            <li data-d="0"><span>Sunday</span><span>10 am – 4 pm</span></li>
+          </ul>
+          <p class="addr">2918 Glen Dr #115B, Coquitlam, BC V3B 2P5<small>Next door to the Pilates studio</small></p>
+          <a class="btn solid" href="https://www.google.com/maps/dir/?api=1&destination=Oliv+Espresso+Lab,+2918+Glen+Dr+%23115B,+Coquitlam,+BC" target="_blank" rel="noopener">Get directions</a>
+          <a class="btn line" href="https://www.instagram.com/oliv.espressolab/" target="_blank" rel="noopener">@oliv.espressolab</a>
+        </div>
+        <iframe class="map" title="Map showing Oliv Espresso Lab on Glen Drive, Coquitlam" loading="lazy"
+          src="https://maps.google.com/maps?q=Oliv+Espresso+Lab,+2918+Glen+Dr,+Coquitlam,+BC&z=16&output=embed"></iframe>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <a class="logo" href="#top"><b>oliv</b><span>espresso lab</span></a>
+  <p>espresso + matcha + life. 2918 Glen Dr, Coquitlam</p>
+  <p>Demo by Sahan Nonis, not an official site</p>
+</footer>
+
+<!-- Drinks, picker, cards, hours. Works with or without 3D. -->
+<script>
+  // Layers from the bottom up: [colour, start, end] as a share of the cup's height
+  window.OLIV_DRINKS = {
+    'strawberry-matcha': { name:'Strawberry matcha', note:'Strawberry, milk and matcha in three layers. The one everyone posts.', dot:'#7BA23F',
+      layers:[['#C8303F',0,.2],['#F3EFE4',.2,.58],['#7FA63F',.58,.86]], streaks:true, ice:true, top:null },
+    'banana-latte': { name:'Casa banana latte', note:'Real banana flavour with espresso on top, finished with a banana chip.', dot:'#F1D36B',
+      layers:[['#F1DF9C',0,.5],['#F5F0E2',.5,.64],['#7A4A2A',.64,.86]], ice:true, top:'banana' },
+    'tiramisu-latte': { name:'Tiramisu latte', note:'Coffee, sweet cream and a dusting of cocoa, like the dessert.', dot:'#A87A52',
+      layers:[['#A87A52',0,.62],['#F1E5D0',.62,.86]], ice:false, top:'cocoa' },
+    'iced-latte': { name:'Iced latte', note:'Milk first, house espresso poured over. Simple and strong.', dot:'#6B3E22',
+      layers:[['#F4F0E6',0,.5],['#C9A27A',.5,.6],['#6B3E22',.6,.86]], ice:true, top:null }
+  };
+  const D = window.OLIV_DRINKS, ids = Object.keys(D);
+  const gradient = d => 'linear-gradient(to top,' + d.layers.map(([c,a,b]) => `${c} ${a*100}%, ${c} ${b*100}%`).join(',') + `, transparent ${d.layers.at(-1)[2]*100}%)`;
+
+  const picker = document.getElementById('picker'), cards = document.getElementById('cards');
+  for (const id of ids) {
+    const d = D[id];
+    const b = document.createElement('button');
+    b.className = 'chip'; b.dataset.id = id; b.setAttribute('aria-pressed','false');
+    b.innerHTML = `<i style="background:${d.dot}"></i>${d.name}`;
+    b.addEventListener('click', () => { userPicked = true; window.olivSelect(id); });
+    picker.append(b);
+    const c = document.createElement('article');
+    c.className = 'card';
+    c.innerHTML = `<div class="mini" style="background:${gradient(d)},#E9ECE2"></div><h3>${d.name}</h3><p>${d.note}</p><button>Pour it in the lab</button>`;
+    c.querySelector('button').addEventListener('click', () => { userPicked = true; window.olivSelect(id); document.getElementById('top').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'}); });
+    cards.append(c);
+  }
+  let current = null, userPicked = false;
+  // Updates the chips and the CSS cup. The 3D script wraps this to also pour the drink.
+  window.olivSelect = id => {
+    current = id;
+    for (const b of picker.children) b.setAttribute('aria-pressed', String(b.dataset.id === id));
+    document.getElementById('fallback-cup').style.background = gradient(D[id]) + ',#E9ECE2';
+  };
+  window.olivSelect(ids[0]);
+  // Show each drink in turn until someone picks one
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    setInterval(() => { if (!userPicked && !document.hidden) window.olivSelect(ids[(ids.indexOf(current) + 1) % ids.length]); }, 6500);
+  }
+
+  // Open-now status (Vancouver time)
+  const H = {0:[600,960],1:[570,1080],2:[570,1080],3:[570,1080],4:[570,1080],5:[570,1080],6:[600,1080]};
+  const fmt = m => { const h=Math.floor(m/60), mm=m%60; return `${(h%12)||12}${mm?':'+String(mm).padStart(2,'0'):''} ${h<12?'am':'pm'}`; };
+  try{
+    const parts = new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',weekday:'short',hour:'numeric',minute:'numeric',hourCycle:'h23'}).formatToParts(new Date());
+    const get = t => parts.find(p=>p.type===t).value;
+    const day = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(get('weekday'));
+    const mins = (+get('hour'))*60 + (+get('minute'));
+    document.querySelector(`#hours li[data-d="${day}"]`)?.classList.add('today');
+    const t = H[day], text = document.getElementById('status-text');
+    if (mins>=t[0] && mins<t[1]) { document.getElementById('dot').classList.add('open'); text.textContent = `Open now until ${fmt(t[1])}`; }
+    else if (mins<t[0]) text.textContent = `Opens today at ${fmt(t[0])}`;
+    else { const n=(day+1)%7; text.textContent = `Closed now. Opens tomorrow at ${fmt(H[n][0])}`; }
+  }catch(e){}
+</script>
+
+<!-- The lab: a clear iced cup that drains and refills, layer by layer -->
+<script type="module">
+  import * as THREE from 'three';
+  import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+  import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+  const D = window.OLIV_DRINKS;
+  const stage = document.getElementById('stage');
+  const canvas = document.getElementById('lab3d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'low-power' });
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.75));
+  renderer.localClippingEnabled = true;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+  const scene = new THREE.Scene();
+  scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+  const key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(-3, 5, 4);
+  scene.add(key, new THREE.HemisphereLight(0xffffff, 0xdfe6cf, 0.5));
+
+  const cup = new THREE.Group(); cup.position.y = -1.4; scene.add(cup);
+  const H = 2.6, R0 = 0.78, R1 = 1.0, BASE = 0.07, INSET = 0.035;
+  const rAt = y => R0 + (R1 - R0) * (y / H);
+  const yOf = f => BASE + f * (H - BASE - 0.12);
+
+  // Soft shadow under the cup
+  {
+    const c = document.createElement('canvas'); c.width = c.height = 128;
+    const g = c.getContext('2d'), rg = g.createRadialGradient(64, 64, 4, 64, 64, 64);
+    rg.addColorStop(0, 'rgba(54,69,47,.32)'); rg.addColorStop(1, 'rgba(54,69,47,0)');
+    g.fillStyle = rg; g.fillRect(0, 0, 128, 128);
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 3.2), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false }));
+    m.rotation.x = -Math.PI / 2; m.position.y = -0.01; cup.add(m);
+  }
+
+  // Clear plastic cup
+  const profile = [new THREE.Vector2(0, 0)];
+  for (let i = 0; i <= 24; i++) { const y = i / 24 * H; profile.push(new THREE.Vector2(rAt(y), y)); }
+  const clear = new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: 0.16, roughness: 0.04, clearcoat: 1, clearcoatRoughness: 0.05, side: THREE.DoubleSide, depthWrite: false });
+  const shell = new THREE.Mesh(new THREE.LatheGeometry(profile, 72), clear); shell.renderOrder = 3; cup.add(shell);
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(R1, 0.028, 10, 72), new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: 0.5, roughness: 0.05, clearcoat: 1 }));
+  rim.rotation.x = Math.PI / 2; rim.position.y = H; rim.renderOrder = 3; cup.add(rim);
+
+  // Straw in their olive green
+  const straw = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 3.7, 20), new THREE.MeshStandardMaterial({ color: '#36452F', roughness: 0.45 }));
+  straw.position.set(0.32, 1.95, -0.18); straw.rotation.z = -0.2; straw.rotation.x = 0.06; cup.add(straw);
+
+  // Everything inside the cup is cut off at the fill line by this clipping plane
+  const clip = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0);
+  const liquid = new THREE.Group(); cup.add(liquid);
+  let layerMeshes = [];
+
+  const surface = new THREE.Mesh(new THREE.CircleGeometry(1, 64), new THREE.MeshStandardMaterial({ roughness: 0.3 }));
+  surface.rotation.x = -Math.PI / 2; cup.add(surface);
+
+  // Strawberry drizzle streaks down the inside of the cup
+  const streakTex = (() => {
+    const c = document.createElement('canvas'); c.width = 1024; c.height = 512;
+    const g = c.getContext('2d'); g.strokeStyle = '#C8303F'; g.lineCap = 'round';
+    for (let i = 0; i < 14; i++) {
+      const x = 30 + i * 72 + Math.random() * 30, len = 160 + Math.random() * 300;
+      g.lineWidth = 10 + Math.random() * 14; g.globalAlpha = 0.85;
+      g.beginPath(); g.moveTo(x, 40);
+      g.bezierCurveTo(x + 22, 40 + len * 0.3, x - 22, 40 + len * 0.6, x + 6, 40 + len); g.stroke();
+    }
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+  })();
+  const streaks = new THREE.Mesh(
+    new THREE.CylinderGeometry(rAt(H) - 0.018, rAt(BASE) - 0.018, H - BASE, 72, 1, true),
+    new THREE.MeshStandardMaterial({ map: streakTex, transparent: true, side: THREE.DoubleSide, depthWrite: false, roughness: 0.35, clippingPlanes: [clip] }));
+  streaks.position.y = BASE + (H - BASE) / 2; streaks.renderOrder = 2; cup.add(streaks);
+
+  // Ice cubes
+  const iceMat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: 0.42, roughness: 0.06, clearcoat: 1, depthWrite: false });
+  const ice = [[-0.38, 0.12, 0.6], [0.25, 0.28, 1.1], [-0.05, -0.36, 2.0], [0.42, -0.2, 0.3]].map(([x, z, r], i) => {
+    const m = new THREE.Mesh(new RoundedBoxGeometry(0.44, 0.44, 0.44, 3, 0.09), iceMat);
+    m.rotation.set(r, r * 1.7, r * 0.5); m.renderOrder = 2; m.userData = { x, z, i }; cup.add(m); return m;
+  });
+
+  // Toppings
+  const chip = new THREE.Group();
+  const chipBody = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.06, 36), new THREE.MeshStandardMaterial({ color: '#E7C873', roughness: 0.6 }));
+  const chipCore = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.065, 30), new THREE.MeshStandardMaterial({ color: '#D8B25C', roughness: 0.6 }));
+  chip.add(chipBody, chipCore); chip.rotation.set(0.25, 0, 0.15); cup.add(chip);
+  const cocoa = (() => {
+    const c = document.createElement('canvas'); c.width = c.height = 256;
+    const g = c.getContext('2d');
+    for (let i = 0; i < 2600; i++) { g.fillStyle = `rgba(92,52,30,${0.35 + Math.random() * 0.5})`; const a = Math.random() * 6.283, r = Math.sqrt(Math.random()) * 120; g.fillRect(128 + Math.cos(a) * r, 128 + Math.sin(a) * r, 2.5, 2.5); }
+    const m = new THREE.Mesh(new THREE.CircleGeometry(1, 48), new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false, roughness: 0.9 }));
+    m.rotation.x = -Math.PI / 2; cup.add(m); return m;
+  })();
+
+  // Pour stream from above while filling
+  const streamGeo = new THREE.CylinderGeometry(0.045, 0.06, 1, 14); streamGeo.translate(0, -0.5, 0);
+  const stream = new THREE.Mesh(streamGeo, new THREE.MeshStandardMaterial({ roughness: 0.3 })); stream.position.x = -0.15; cup.add(stream);
+
+  let drink = null, topY = BASE, fill = BASE, phase = 'idle', phaseT = 0, queued = null, drainFrom = BASE;
+  function build(id) {
+    for (const m of layerMeshes) { liquid.remove(m); m.geometry.dispose(); m.material.dispose(); }
+    drink = D[id];
+    layerMeshes = drink.layers.map(([c, f0, f1]) => {
+      const y0 = yOf(f0), y1 = yOf(f1);
+      const m = new THREE.Mesh(new THREE.CylinderGeometry(rAt(y1) - INSET, rAt(y0) - INSET, y1 - y0, 64),
+        new THREE.MeshStandardMaterial({ color: c, roughness: 0.32, clippingPlanes: [clip] }));
+      m.position.y = (y0 + y1) / 2; liquid.add(m); return m;
+    });
+    topY = yOf(drink.layers.at(-1)[2]);
+    streaks.visible = !!drink.streaks;
+  }
+  const colourAt = y => { for (const [c, f0, f1] of drink.layers) if (y <= yOf(f1) + 1e-4) return c; return drink.layers.at(-1)[0]; };
+
+  function choose(id) {
+    if (drink === D[id] && (phase === 'pour' || phase === 'hold')) return;
+    if (phase === 'idle' || reduce) { build(id); fill = reduce ? topY : BASE; phase = reduce ? 'hold' : 'pour'; phaseT = 0; return; }
+    queued = id; if (phase !== 'drain') { phase = 'drain'; phaseT = 0; drainFrom = fill; }
+  }
+  const prev = window.olivSelect;
+  window.olivSelect = id => { prev(id); choose(id); if (reduce) render(0, performance.now()); };
+
+  const easeOut = t => 1 - Math.pow(1 - t, 3);
+  function step(dt, t) {
+    phaseT += dt;
+    if (phase === 'pour') {
+      const k = Math.min(1, phaseT / 2.2);
+      fill = BASE + (topY - BASE) * easeOut(k);
+      if (k >= 1) { phase = 'hold'; phaseT = 0; }
+    } else if (phase === 'drain') {
+      const k = Math.min(1, phaseT / 0.55);
+      fill = drainFrom + (BASE - drainFrom) * k;
+      if (k >= 1) { build(queued); queued = null; phase = 'pour'; phaseT = 0; }
+    }
+    clip.constant = cup.position.y + fill;
+
+    const hasLiquid = fill > BASE + 0.01;
+    surface.visible = hasLiquid;
+    surface.position.y = fill; surface.scale.setScalar(rAt(fill) - INSET);
+    const atTop = phase === 'hold';
+    surface.material.color.set(atTop && drink.top === 'cocoa' ? '#F1E5D0' : colourAt(fill));
+
+    cocoa.visible = atTop && drink.top === 'cocoa';
+    cocoa.position.y = fill + 0.004; cocoa.scale.setScalar(rAt(fill) - INSET - 0.02);
+    chip.visible = atTop && drink.top === 'banana';
+    chip.position.set(-0.12, fill + 0.05 + Math.sin(t * 1.6) * 0.012, 0.1);
+
+    for (const m of ice) {
+      const { x, z, i } = m.userData;
+      const y = topY - 0.1 - (i % 2) * 0.16 + Math.sin(t * 1.3 + i) * 0.025;   // tops poke just above the surface
+      m.position.set(x, Math.min(y, fill - 0.08), z);
+      m.visible = drink.ice && fill > BASE + 0.6;
+    }
+
+    stream.visible = phase === 'pour' && !reduce;
+    if (stream.visible) {
+      const top = H + 1.6;
+      stream.position.y = top; stream.scale.y = Math.max(0.01, top - fill);
+      stream.material.color.set(colourAt(fill));
+    }
+  }
+
+  function fit() {
+    const w = stage.clientWidth, h = stage.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+    const halfV = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    const dist = Math.max(2.25 / halfV, 1.35 / (halfV * camera.aspect)) + 1;
+    camera.position.set(0, 1.6, dist);
+    camera.lookAt(0, 0.05, 0);
+    if (reduce) render(0, performance.now());
+  }
+  new ResizeObserver(fit).observe(stage);
+
+  // Drag sideways to turn the cup; vertical swipes still scroll the page
+  let yaw = 0, dragging = false, lastX = 0;
+  canvas.addEventListener('pointerdown', e => { dragging = true; lastX = e.clientX; canvas.setPointerCapture(e.pointerId); });
+  canvas.addEventListener('pointermove', e => { if (dragging) { yaw += (e.clientX - lastX) * 0.01; lastX = e.clientX; } });
+  canvas.addEventListener('pointerup', () => dragging = false);
+  canvas.addEventListener('pointercancel', () => dragging = false);
+
+  let last = performance.now(), running = true, raf = 0;
+  const t0 = last;
+  function render(dt, now) {
+    const t = (now - t0) / 1000;
+    if (!dragging && !reduce) yaw += dt * 0.22;     // slow turn so the layers and drizzle show from every side
+    cup.rotation.y = yaw;
+    step(dt, t);
+    renderer.render(scene, camera);
+  }
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    render(dt, now);
+    if (running) raf = requestAnimationFrame(frame);
+  }
+
+  stage.classList.add('is-3d');
+  document.getElementById('hint').hidden = false;
+  choose(document.querySelector('.chip[aria-pressed="true"]')?.dataset.id || Object.keys(D)[0]);
+  fit();
+  if (reduce) { running = false; render(0, performance.now()); } else raf = requestAnimationFrame(frame);
+
+  const setRunning = on => {
+    if (reduce) return;
+    if (on && !running) { running = true; last = performance.now(); raf = requestAnimationFrame(frame); }
+    if (!on) { running = false; cancelAnimationFrame(raf); }
+  };
+  new IntersectionObserver(([e]) => setRunning(e.isIntersecting && !document.hidden)).observe(stage);
+  document.addEventListener('visibilitychange', () => setRunning(!document.hidden));
+</script>
+</body>
+</html>
